@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import userAPI from "../../services/userAPI";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const OtpVerification = () => {
-  const [otp, setOtp] = useState(new Array(6).fill("")); // State for OTP digits
-  const [resendTimer, setResendTimer] = useState(37); // Timer for resend button
+  const [otp, setOtp] = useState(new Array(6).fill(""));
+  const [resendTimer, setResendTimer] = useState(37);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email;
 
   // Handle OTP input change
   const handleChange = (value, index) => {
-    if (isNaN(value)) return; // Prevent non-numeric input
+    if (isNaN(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -25,10 +33,17 @@ const OtpVerification = () => {
   };
 
   // Resend OTP handler
-  const handleResend = () => {
+  const handleResend = async () => {
     if (resendTimer === 0) {
-      setResendTimer(37); // Reset timer
-      console.log("Resending OTP..."); // Add API call here
+      setResendTimer(37);
+      try {
+        const response = await userAPI.resendOTP({ email: email });
+        setSuccess(response.message);
+        setError("");
+      } catch (err) {
+        console.error("Error posting data:", err.message);
+        setError(err.message);
+      }
     }
   };
 
@@ -43,10 +58,25 @@ const OtpVerification = () => {
     }
   }, [resendTimer]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const otpCode = otp.join("");
-    console.log("Submitted OTP:", otpCode); // Add API call for verification
+    const otpString = otp.join("");
+    try {
+      const response = await userAPI.verifyOTP({ email, otp: otpString });
+      localStorage.setItem(
+        "accessToken",
+        JSON.stringify(response.data.accessToken)
+      );
+      localStorage.setItem(
+        "refreshToken",
+        JSON.stringify(response.data.refreshToken)
+      );
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error posting data:", err.message);
+      setError(err.message);
+      setSuccess("");
+    }
   };
 
   return (
@@ -108,6 +138,8 @@ const OtpVerification = () => {
               Resend
             </button>
           </div>
+          <span className="text-2sm mb-1.5 text-red-600">{error}</span>
+          <span className="text-2sm mb-1.5 text-green-600">{success}</span>
           <button
             type="submit"
             className="btn btn-primary flex justify-center grow"

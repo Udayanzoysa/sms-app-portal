@@ -7,7 +7,9 @@ import ResetPassword from "../components/auth/ResetPassword";
 import Register from "../components/auth/Register";
 import OtpVerification from "../components/auth/OtpVerification";
 
+
 const RouterConfigs = () => {
+
   //ViewOfficerPage
   const element = useRoutes([
     {
@@ -27,35 +29,29 @@ const RouterConfigs = () => {
           element: <ResetPassword />,
         },
         {
-          path: "/otp-verification",
+          path: "/verify-otp",
           element: <OtpVerification />,
         },
       ],
     },
     // {
-    //   path: "/app",
+    //   path: "/dashboard",
     //   element: <InternalLayout />,
     //   children: [
     //     {
     //       index: true,
-    //       element: <Dashboard />,
+    //       element: <ProtectedRoute element={<Dashboard />} />,
     //     },
-    //     {
-    //       path: "user-list",
-    //       element: (
-    //         <ProtectedAdminRoute
-    //           element={<UserList />}
-    //           userRole={user.role ?? ""}
-    //         />
-    //       ),
-    //     },
+    //     // {
+    //     //   path: "user-list",
+    //     // },
     //     {
     //       path: "unauthorized",
     //       element: <Unauthorized />,
     //     },
     //     {
     //       path: "profile",
-    //       element: <Profile />,
+    //       element: <ProtectedRoute element={<Profile />} />, // Protected profile route
     //     },
     //   ],
     // },

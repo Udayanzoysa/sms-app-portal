@@ -1,24 +1,27 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import userAPI from "../../services/userAPI";
+
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // For password visibility toggle
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    if (username === "" || password === "") {
-      setError("Both fields are required");
-      return;
-    }
-
-    // Replace with your actual login logic
-    if (username === "admin" && password === "password") {
-      alert("Login successful!");
-      // Redirect to another page if needed
-    } else {
-      setError("Invalid username or password");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const { data } = await userAPI.verifyUser(formData);
+      navigate("/verify-otp", { state: { email: data.email } });
+    } catch (err) {
+      setError(err.message || "Invalid credentials");
+      console.log(err);
     }
   };
 
@@ -28,7 +31,7 @@ const Login = () => {
         action="#"
         className="card-body flex flex-col gap-5 p-10"
         id="sign_in_form"
-        method="get"
+        method="post" // Changed to post method
         onSubmit={handleSubmit}
       >
         <div className="text-center mb-2.5">
@@ -53,8 +56,9 @@ const Login = () => {
             className="input"
             placeholder="email@email.com"
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="email" // Added name for email input
+            value={formData.email}
+            onChange={handleChange}
           />
         </div>
 
@@ -69,19 +73,27 @@ const Login = () => {
           </div>
           <div className="input" data-toggle-password="true">
             <input
-              name="user_password"
+              name="password" // Corrected name for password input
               placeholder="Enter Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? "text" : "password"} // Toggle password visibility
+              value={formData.password}
+              onChange={handleChange}
             />
             <button
               className="btn btn-icon"
-              data-toggle-password-trigger="true"
               type="button"
+              onClick={() => setShowPassword(!showPassword)} // Toggle password visibility on button click
             >
-              <i className="ki-filled ki-eye text-gray-500 toggle-password-active:hidden"></i>
-              <i className="ki-filled ki-eye-slash text-gray-500 hidden toggle-password-active:block"></i>
+              <i
+                className={`ki-filled ki-eye text-gray-500 ${
+                  showPassword ? "hidden" : "block"
+                }`}
+              ></i>
+              <i
+                className={`ki-filled ki-eye-slash text-gray-500 ${
+                  showPassword ? "block" : "hidden"
+                }`}
+              ></i>
             </button>
           </div>
         </div>

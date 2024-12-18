@@ -1,27 +1,47 @@
 import React, { useState } from "react";
+import { handleFormChange } from "../../utils/formUtils";
+import { callExternalApi } from "../../utils/apiUtils";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirm_password: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    accept_terms: false,
+  });
+  const navigate = useNavigate();
+  const onChange = handleFormChange(setFormData);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // You can add your validation logic here
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirm_password) {
       alert("Passwords do not match");
       return;
     }
-
-    if (!acceptTerms) {
+    if (!formData.accept_terms) {
       alert("You must accept the Terms and Conditions");
       return;
     }
-
-    alert("Sign up successful!");
-    // Add your sign up logic here (e.g., API call)
+    try {
+      const result = await callExternalApi(
+        "http://localhost:5000/api/auth/register",
+        "POST",
+        formData
+      );
+      console.log("API Response:", result);
+      navigate("/verify-otp", { state: { email: result.email } });
+    } catch (err) {
+      console.error("Error posting data:", err.message);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,14 +67,48 @@ const Register = () => {
           </div>
         </div>
         <div className="flex flex-col gap-1">
+          <label className="form-label text-gray-900">First Name</label>
+          <input
+            className="input"
+            name="first_name"
+            placeholder="John"
+            type="text"
+            value={formData.first_name}
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="form-label text-gray-900">Last Name</label>
+          <input
+            className="input"
+            name="last_name"
+            placeholder="Morrison"
+            type="text"
+            value={formData.last_name}
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
           <label className="form-label text-gray-900">Email</label>
           <input
             className="input"
-            name="user_email"
+            name="email"
             placeholder="email@email.com"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="form-label text-gray-900">Phone</label>
+          <input
+            className="input"
+            name="phone"
+            placeholder="070 111 1111"
+            type="number"
+            value={formData.phone}
+            maxLength={10}
+            onChange={onChange}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -63,11 +117,11 @@ const Register = () => {
           </label>
           <div className="input" data-toggle-password="true">
             <input
-              name="user_password"
+              name="password"
               placeholder="Enter Password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={onChange}
             />
             <button
               className="btn btn-icon"
@@ -85,11 +139,11 @@ const Register = () => {
           </label>
           <div className="input" data-toggle-password="true">
             <input
-              name="user_password"
+              name="confirm_password"
               placeholder="Re-enter Password"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirm_password}
+              onChange={onChange}
             />
             <button
               className="btn btn-icon"
@@ -104,10 +158,10 @@ const Register = () => {
         <label className="checkbox-group">
           <input
             className="checkbox checkbox-sm"
-            name="check"
+            name="accept_terms"
             type="checkbox"
-            checked={acceptTerms}
-            onChange={(e) => setAcceptTerms(e.target.checked)}
+            checked={formData.accept_terms}
+            onChange={onChange}
           />
           <span className="checkbox-label">
             I accept
@@ -116,11 +170,13 @@ const Register = () => {
             </a>
           </span>
         </label>
+        <label className="text-danger">{isError ? isError : ""}</label>
         <button
           className="btn btn-primary flex justify-center grow"
           type="submit"
+          disabled={isLoading}
         >
-          Sign up
+          {isLoading ? "Signing...." : "Sign In"}
         </button>
       </form>
     </div>
