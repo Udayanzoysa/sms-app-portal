@@ -6,10 +6,10 @@ import Login from "../components/auth/Login";
 import ResetPassword from "../components/auth/ResetPassword";
 import Register from "../components/auth/Register";
 import OtpVerification from "../components/auth/OtpVerification";
-
+import ProtectedRoute from "./ProtectedRoute";
+import Dashboard from "../components/pages/Dashboard";
 
 const RouterConfigs = () => {
-
   //ViewOfficerPage
   const element = useRoutes([
     {
@@ -34,27 +34,31 @@ const RouterConfigs = () => {
         },
       ],
     },
-    // {
-    //   path: "/dashboard",
-    //   element: <InternalLayout />,
-    //   children: [
-    //     {
-    //       index: true,
-    //       element: <ProtectedRoute element={<Dashboard />} />,
-    //     },
-    //     // {
-    //     //   path: "user-list",
-    //     // },
-    //     {
-    //       path: "unauthorized",
-    //       element: <Unauthorized />,
-    //     },
-    //     {
-    //       path: "profile",
-    //       element: <ProtectedRoute element={<Profile />} />, // Protected profile route
-    //     },
-    //   ],
-    // },
+    {
+      path: "/dashboard",
+      element: <InternalLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          ),
+        },
+        // {
+        //   path: "user-list",
+        // },
+        // {
+        //   path: "unauthorized",
+        //   element: <Unauthorized />,
+        // },
+        // {
+        //   path: "profile",
+        //   element: <ProtectedRoute element={<Profile />} />, // Protected profile route
+        // },
+      ],
+    },
   ]);
 
   return element;

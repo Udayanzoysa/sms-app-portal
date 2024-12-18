@@ -21,7 +21,7 @@ const userAPI = {
   },
   verifyOTP: async (email, otp) => {
     try {
-      const response = await API.post("/2fa/verify", email);
+      const response = await API.post("/2fa/verify", { email, otp });
       return response;
     } catch (error) {
       throw new Error(

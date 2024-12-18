@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import userAPI from "../../services/userAPI";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/useAuth";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -11,6 +12,7 @@ const OtpVerification = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email;
+  const { auth, setAuth, loginUser } = useContext(AuthContext);
 
   // Handle OTP input change
   const handleChange = (value, index) => {
@@ -61,22 +63,7 @@ const OtpVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const otpString = otp.join("");
-    try {
-      const response = await userAPI.verifyOTP({ email, otp: otpString });
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(response.data.accessToken)
-      );
-      localStorage.setItem(
-        "refreshToken",
-        JSON.stringify(response.data.refreshToken)
-      );
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("Error posting data:", err.message);
-      setError(err.message);
-      setSuccess("");
-    }
+    loginUser(email, otpString);
   };
 
   return (
