@@ -1,30 +1,7 @@
 import React from "react";
-import DropdownMenu from "./DropdownMenu";
 import UserDropdownMenu from "./UserDropdownMenu";
 
 const Header = () => {
-  const accountMenuItems = [
-    {
-      title: "Public Profile",
-      link: "/profile",
-      icon: "ki-profile-circle",
-    },
-    {
-      title: "Account",
-      link: "/my-account",
-      icon: "ki-setting-2",
-    },
-    {
-      title: "Network",
-      link: "/network",
-      icon: "ki-users",
-    },
-    {
-      title: "Authentication",
-      link: "/auth",
-      icon: "ki-security-user",
-    },
-  ];
   return (
     <header className="flex items-center transition-[height] shrink-0 bg-[--tw-page-bg] dark:bg-[--tw-page-bg-dark] h-[--tw-header-height]">
       <div className="flex justify-between items-center lg:gap-4 container-fixed">
@@ -45,10 +22,6 @@ const Header = () => {
             <h3 className="text-gray-700 text-base hidden md:block">
               SMS Platform
             </h3>
-            <span className="text-sm text-gray-400 font-medium px-2.5 hidden md:inline">
-              /
-            </span>
-            <DropdownMenu name="Account" menuItems={accountMenuItems} />
           </div>
         </div>
         <div className="flex items-center gap-3.5">
