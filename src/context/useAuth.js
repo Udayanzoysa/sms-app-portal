@@ -3,7 +3,8 @@ import axios from "axios";
 import userAPI from "../services/userAPI";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export const AuthContext = createContext();
 
@@ -13,16 +14,14 @@ export const AuthProvider = ({ children }) => {
     isReady: false,
   });
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const loginUser = async (email, otpToken) => {
     try {
       const res = await userAPI.verifyOTP(email, otpToken);
-      if (res) {
-        const { accessToken, refreshToken } = res?.data;
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        setToken({ accessToken, isReady: true });
+      if (res.status === 200) {
+        const storedToken = Cookies.get("accessToken");
+        setToken({ accessToken: storedToken, isReady: true });
         navigate("/dashboard");
       }
     } catch (e) {
@@ -51,7 +50,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = Cookies.get("accessToken");
+    console.log("Stored Token on Load:", storedToken); // Debug log
     if (storedToken) {
       setToken({
         accessToken: storedToken,
