@@ -42,6 +42,19 @@ const userAPI = {
       throw new Error(error.response?.data?.message || "Error resending OTP");
     }
   },
+
+  refreshToken: async () => {
+    try {
+      const response = await API.post("/token/refresh", {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Error refreshing token"
+      );
+    }
+  },
 };
 
 export default userAPI;

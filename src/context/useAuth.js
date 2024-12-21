@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      const response = await axios.post("/token/refresh");
+      const response = await userAPI.refreshToken();
       setToken((prev) => ({
         ...prev,
         accessToken: response.data.accessToken,
@@ -42,11 +42,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     refreshAccessToken();
+  //   }, 14 * 60 * 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
   useEffect(() => {
-    const interval = setInterval(() => {
-      refreshAccessToken();
-    }, 14 * 60 * 1000);
-    return () => clearInterval(interval);
+    refreshAccessToken();
   }, []);
 
   useEffect(() => {

@@ -7,8 +7,6 @@ import { AuthContext } from "../../context/useAuth";
 const OtpVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [resendTimer, setResendTimer] = useState(37);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email;
@@ -40,11 +38,8 @@ const OtpVerification = () => {
       setResendTimer(37);
       try {
         const response = await userAPI.resendOTP({ email: email });
-        setSuccess(response.message);
-        setError("");
       } catch (err) {
         console.error("Error posting data:", err.message);
-        setError(err.message);
       }
     }
   };
@@ -125,8 +120,6 @@ const OtpVerification = () => {
               Resend
             </button>
           </div>
-          <span className="text-2sm mb-1.5 text-red-600">{error}</span>
-          <span className="text-2sm mb-1.5 text-green-600">{success}</span>
           <button
             type="submit"
             className="btn btn-primary flex justify-center grow"
