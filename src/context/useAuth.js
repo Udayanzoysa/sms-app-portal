@@ -38,23 +38,19 @@ export const AuthProvider = ({ children }) => {
       }));
     } catch (error) {
       console.error("Failed to refresh access token:", error);
-      setToken({ accessToken: null, isReady: true });
+      setToken({ accessToken: null, isReady: false });
     }
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     refreshAccessToken();
-  //   }, 14 * 60 * 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
   useEffect(() => {
-    refreshAccessToken();
+    const interval = setInterval(() => {
+      refreshAccessToken();
+    }, 14 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const storedToken = Cookies.get("accessToken");
-    console.log("Stored Token on Load:", storedToken); // Debug log
     if (storedToken) {
       setToken({
         accessToken: storedToken,
